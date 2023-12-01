@@ -42,6 +42,7 @@ def to_useful(graph, states):
                 if nx.has_path(D, i, j):
                     continue
                 else:
+                    print('removing j')
                     D.remove_node(j)
             except:
                 pass
@@ -53,7 +54,8 @@ def to_useful(graph, states):
                 if nx.has_path(D, j, i):
                     continue
                 else:
-                    D.remove_node(i)
+                    print('removing j')
+                    D.remove_node(j)
             except:
                 pass
     return D
