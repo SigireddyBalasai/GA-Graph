@@ -54,7 +54,7 @@ class Generation:
         crossed = []
         for i in range(len(self.population)):
             if random.random() < crossover_rate:
-                crossed.append(self.population[i].crossover(self.population[i+1]))
+                crossed.append(self.population[i].crossover(self.population[i-1]))
         self.population += crossed
         return self.population
 
@@ -68,7 +68,7 @@ class Generation:
 
     def run(self,n,X,y,mutation_rate,crossover_rate):
         for i in range(n):
-            os.mkdir(f'generation_{self.generation}')
+            os.makedirs(f'generation_{self.generation}',exist_ok=True)
             print(f'Generation: {self.generation}')
             print(f'Best score: {self.get_best_individual().get_score()}')
             print(f'Best parameters: {self.get_best_individual().get_num_parameters()}')
