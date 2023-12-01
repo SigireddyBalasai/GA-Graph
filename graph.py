@@ -35,8 +35,10 @@ def to_useful(graph, states):
     # remove a node if no path to input or final node
     D = graph.copy()
     for i in range(states[0]):
-        for j in range(states[0], states[0]+states[1]+states[2]+1):
+        for j in range(states[0], states[0]+states[1]+states[2]):
+            print(i,j)
             try:
+                print(nx.has_path(D, i, j))
                 if nx.has_path(D, i, j):
                     continue
                 else:
@@ -44,8 +46,10 @@ def to_useful(graph, states):
             except:
                 pass
     for i in range(states[0]+states[1], states[0]+states[1]+states[2]):
-        for j in range(states[0], states[0]+states[1]+states[2]):
+        for j in range(states[0], states[0]+states[1]+states[2]+1):
+            print(i,j)
             try:
+                print(nx.has_path(D, j, i))
                 if nx.has_path(D, j, i):
                     continue
                 else:
