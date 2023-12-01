@@ -46,9 +46,10 @@ class Individual:
         import tensorflow as tf
         x_train, x_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
         num_parameters = self.model.count_params()
-        self.model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.0001), metrics=['accuracy'])
+        self.model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.001), metrics=['accuracy'])
         history = self.model.fit(x_train, y_train, epochs=5, batch_size=10)
         val_loss,val_accuracy = self.model.evaluate(x_test, y_test, verbose=0)
+        #saving model with roc score accuracy precision seperated by - 
         roc = metrics.roc_auc_score(y_test, self.model.predict(x_test))
         self.roc = roc
         self.val_loss = val_loss
@@ -96,6 +97,13 @@ class Individual:
         plt.figure(figsize=(10,10))
         nx.draw(self.graph, with_labels=True)
         plt.show()
+
+    def get_roc(self):
+        return self.roc
+    
+    def save_model(self,folder):
+        self.model.save(f'{folder}/{self.score}-{self.accuracy}-{self.val_accuracy}-{self.loss}-{self.val_loss}-{self.num_parameters}-{self.roc}.h5')
+
     
 
     

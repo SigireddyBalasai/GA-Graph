@@ -1,5 +1,6 @@
 from Individual import Individual
 import random
+import os
 
 class Generation:
     def __init__(self,input_size,output_size,states,nodes,edges,population,limit,X,y):
@@ -13,6 +14,7 @@ class Generation:
         self.generation = 0
         self.create_population(self.input_size, self.output_size, self.states, self.nodes, self.edges)
         self.score_population(X, y)
+
 
     def get_generation(self):
         return self.generation
@@ -66,7 +68,7 @@ class Generation:
 
     def run(self,n,X,y,mutation_rate,crossover_rate):
         for i in range(n):
-
+            os.mkdir(f'generation_{self.generation}')
             print(f'Generation: {self.generation}')
             print(f'Best score: {self.get_best_individual().get_score()}')
             print(f'Best parameters: {self.get_best_individual().get_num_parameters()}')
@@ -75,5 +77,9 @@ class Generation:
             print(f'Best history: {self.get_best_individual().get_history()}')
             print(f'Best model: {self.get_best_individual().get_model()}')
             print(f'Best graph: {self.get_best_individual().get_graph()}')
+            print(f"Best ROC: {self.get_best_individual().get_roc()}")
+            print('---------------------------------------------------')
             self.next_generation(X, y, mutation_rate, crossover_rate)
+            for individual in self.population:
+                individual.save_model(f'generation_{self.generation}')
         return self.population
