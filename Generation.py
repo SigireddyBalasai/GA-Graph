@@ -54,7 +54,10 @@ class Generation:
         crossed = []
         for i in range(len(self.population)):
             if random.random() < crossover_rate:
-                crossed.append(self.population[i].crossover(self.population[i-1]))
+                try:
+                    crossed.append(self.population[i].crossover(self.population[i-1]))
+                except:
+                    crossed.append(self.population[i])
         self.population += crossed
         return self.population
 
