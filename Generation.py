@@ -1,7 +1,8 @@
 from Individual import Individual
+import random
 
 class Generation:
-    def __init__(self,input_size,output_size,states,nodes,edges,population,limit):
+    def __init__(self,input_size,output_size,states,nodes,edges,population,limit,X,y):
         self.input_size = input_size
         self.output_size = output_size
         self.states = states
@@ -11,6 +12,7 @@ class Generation:
         self.limit = limit
         self.generation = 0
         self.create_population(self.input_size, self.output_size, self.states, self.nodes, self.edges)
+        self.score_population(X, y)
 
     def get_generation(self):
         return self.generation
@@ -32,7 +34,7 @@ class Generation:
     
     def score_population(self, X, y):
         for individual in self.population:
-            individual.set_score(individual.score(X, y))
+            individual.score(X, y)
         self.population.sort(key=lambda x: x.get_score(), reverse=True)
         return self.population
     
@@ -64,9 +66,10 @@ class Generation:
 
     def run(self,n,X,y,mutation_rate,crossover_rate):
         for i in range(n):
+
             print(f'Generation: {self.generation}')
             print(f'Best score: {self.get_best_individual().get_score()}')
-            print(f'Best parameters: {self.get_best_individual().get_parameters()}')
+            print(f'Best parameters: {self.get_best_individual().get_num_parameters()}')
             print(f'Best loss: {self.get_best_individual().get_loss()}')
             print(f'Best accuracy: {self.get_best_individual().get_accuracy()}')
             print(f'Best history: {self.get_best_individual().get_history()}')

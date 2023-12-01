@@ -3,6 +3,7 @@ from model import create_model
 from crossover import crossover
 from mutate import mutate_dag
 import networkx as nx
+import tensorflow as tf
 from matplotlib import pyplot as plt
 
 class Individual:
@@ -17,13 +18,21 @@ class Individual:
         self.accuracy = 0
         self.num_parameters = 0
         self.history = 0
+        self.val_loss = 0
+        self.val_accuracy = 0
+        self.roc = 0
         self.graph = assign_states(self.create_random_graph(),self.states)
-        nx.draw(self.graph, with_labels=True)
-        plt.show()
         self.normalized = to_useful(self.graph, self.states)
         nx.draw(self.normalized, with_labels=True)
         plt.show()
-        self.model = create_model(self.normalized, self.input_size, self.output_size)
+        try:
+            self.model = create_model(self.normalized, self.input_size, self.output_size)
+        except:
+            self.graph = assign_states(self.create_random_graph(),self.states)
+            self.normalized = to_useful(self.graph, self.states)
+            self.model = create_model(self.normalized, self.input_size, self.output_size)
+            nx.draw(self.normalized, with_labels=True)
+            plt.show()
 
 
     def create_random_graph(self):
@@ -33,20 +42,25 @@ class Individual:
 
     def score(self, X, y):
         from sklearn import model_selection
-        from sklearn import preprocessing
         from sklearn import metrics
+        import tensorflow as tf
         x_train, x_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
         num_parameters = self.model.count_params()
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        self.model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.0001), metrics=['accuracy'])
         history = self.model.fit(x_train, y_train, epochs=5, batch_size=10)
-        loss,accuracy = self.model.evaluate(x_test, y_test, verbose=0)
-        score = metrics.roc_auc_score(y_test, self.model.predict(x_test))
-        self.score_ = score
+        val_loss,val_accuracy = self.model.evaluate(x_test, y_test, verbose=0)
+        roc = metrics.roc_auc_score(y_test, self.model.predict(x_test))
+        self.roc = roc
+        self.val_loss = val_loss
+        self.val_accuracy = val_accuracy
+        loss = history.history['loss'][-1]
+        accuracy = history.history['accuracy'][-1]
         self.loss = loss
         self.accuracy = accuracy
         self.num_parameters = num_parameters
         self.history = history
-        return score,loss,accuracy,num_parameters,history
+        score =  score = 10 * accuracy + 100 * val_accuracy +  10 * - 1 / loss + 1000 * 1/val_loss - 0.0001 * num_parameters + (roc - 0.5) * 1000
+        return score,loss,accuracy,num_parameters,history,roc
 
     def mutate(self):
         self.graph = mutate_dag(self.graph)

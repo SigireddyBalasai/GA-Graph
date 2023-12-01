@@ -19,13 +19,21 @@ def assign_states(graph, states):
         graph.nodes[i]['state'] = 'input'
     for i in range(states[0], states[0]+states[1]):
         graph.nodes[i]['state'] = 'hidden'
-        choice = random.choice(['Dense','DropOut',])
+        choice = random.choice(['DropOut','Conv2D','Dense','MaxPooling2D','AveragePooling2D'])
         graph.nodes[i]['layer'] = choice
         if choice == 'Dense':
-            graph.nodes[i]['activation'] = random.choice(['relu','sigmoid','tanh','softmax'])
-            graph.nodes[i]['units'] = random.randint(1, 100)
+            graph.nodes[i]['units'] = random.randint(1, 30)
+            graph.nodes[i]['activation'] = random.choice(['relu','sigmoid','softmax','tanh'])
         elif choice == 'DropOut':
             graph.nodes[i]['rate'] = random.uniform(0, 1)
+        elif choice == 'Conv2D':
+            graph.nodes[i]['filters'] = random.randint(1, 30)
+            graph.nodes[i]['kernel_size'] = random.randint(1, 30)
+            graph.nodes[i]['activation'] = random.choice(['relu','sigmoid','softmax','tanh'])
+        elif choice == 'MaxPooling2D':
+            graph.nodes[i]['pool_size'] = random.randint(1, 30)
+        elif choice == 'AveragePooling2D':
+            graph.nodes[i]['pool_size'] = random.randint(1, 30)
         
     for i in range(states[0]+states[1], states[0]+states[1]+states[2]):
         graph.nodes[i]['state'] = 'output'
