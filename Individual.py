@@ -70,10 +70,13 @@ class Individual:
         return self
 
     def crossover(self, other):
-        self.graph = crossover(self.graph, other.graph)
-        self.normalized = to_useful(self.graph, self.states)
-        self.model = create_model(self.normalized, self.input_size, self.output_size)
-        return self
+        try:
+            self.graph = crossover(self.graph, other.graph)
+            self.normalized = to_useful(self.graph, self.states)
+            self.model = create_model(self.normalized, self.input_size, self.output_size)
+            return self
+        except:
+            return self
     
     def get_score(self):
         return self.score_
