@@ -5,6 +5,7 @@ from mutate import mutate_dag
 import networkx as nx
 import tensorflow as tf
 from matplotlib import pyplot as plt
+import numpy as np
 
 class Individual:
     def __init__(self, input_size, output_size, states, nodes, edges):
@@ -13,55 +14,32 @@ class Individual:
         self.states = states
         self.nodes = nodes
         self.edges = edges
-        self.score_ = 0
-        self.loss = 0
-        self.accuracy = 0
-        self.num_parameters = 0
-        self.history = 0
-        self.val_loss = 0
-        self.val_accuracy = 0
-        self.roc = 0
-        self.graph = assign_states(self.create_random_graph(),self.states)
+        self.graph = assign_states(self.create_random_graph(), self.states)
         self.normalized = to_useful(self.graph, self.states)
-        nx.draw(self.normalized, with_labels=True)
-        plt.show()
-        try:
-            self.model = create_model(self.normalized, self.input_size, self.output_size)
-        except:
-            self.graph = assign_states(self.create_random_graph(),self.states)
-            self.normalized = to_useful(self.graph, self.states)
-            self.model = create_model(self.normalized, self.input_size, self.output_size)
-            nx.draw(self.normalized, with_labels=True)
-            plt.show()
-
+        self.model = create_model(self.normalized, self.input_size, self.output_size)
+        self.score = 0
 
     def create_random_graph(self):
         graph = nx.DiGraph()
         graph = create_random_graph(self.nodes, self.edges)
         return graph
 
-    def score(self, X, y):
-        from sklearn import model_selection
-        from sklearn import metrics
-        import tensorflow as tf
-        x_train, x_test, y_train, y_test = model_selection.train_test_split(X, y, test_size=0.2)
-        num_parameters = self.model.count_params()
-        self.model.compile(loss='binary_crossentropy', optimizer=tf.keras.optimizers.Adam(0.001), metrics=['accuracy'])
-        history = self.model.fit(x_train, y_train, epochs=5, batch_size=10)
-        val_loss,val_accuracy = self.model.evaluate(x_test, y_test, verbose=0)
-        #saving model with roc score accuracy precision seperated by - 
-        roc = metrics.roc_auc_score(y_test, self.model.predict(x_test))
-        self.roc = roc
-        self.val_loss = val_loss
-        self.val_accuracy = val_accuracy
-        loss = history.history['loss'][-1]
-        accuracy = history.history['accuracy'][-1]
-        self.loss = loss
-        self.accuracy = accuracy
-        self.num_parameters = num_parameters
-        self.history = history
-        score =  score = 10 * accuracy + 100 * val_accuracy +  10 * - 1 / loss + 1000 * 1/val_loss - 0.0001 * num_parameters + (roc - 0.5) * 1000
-        return score,loss,accuracy,num_parameters,history,roc
+    def evaluate(self, train_ds):
+        accuracies = []
+        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        for i in train_ds:
+            #x = tf.expand_dims(i[0], axis=0)
+            #y = tf.expand_dims(i[1], axis=0)
+            #print(x.shape, y.shape, "x.shape, y.shape")
+            loss,accuracy = self.model.evaluate(i[0], i[1], verbose=0)
+            accuracies.append(accuracy)
+
+        accuracies = np.array(accuracies)
+        mean_accuracy = np.mean(accuracies)
+        std_accuracy = np.std(accuracies)
+
+        score = mean_accuracy / std_accuracy
+        self.score = score
 
     def mutate(self):
         self.graph = mutate_dag(self.graph)
@@ -70,47 +48,28 @@ class Individual:
         return self
 
     def crossover(self, other):
-        try:
-            self.graph = crossover(self.graph, other.graph)
-            self.normalized = to_useful(self.graph, self.states)
-            self.model = create_model(self.normalized, self.input_size, self.output_size)
-            return self
-        except:
-            return self
-    
-    def get_score(self):
-        return self.score_
-
-    def get_loss(self):
-        return self.loss
-
-    def get_accuracy(self):
-        return self.accuracy
-
-    def get_num_parameters(self):
-        return self.num_parameters
-
-    def get_history(self):
-        return self.history
+        self.graph = crossover(self.graph, other.graph)
+        self.normalized = to_useful(self.graph, self.states)
+        self.model = create_model(self.normalized, self.input_size, self.output_size)
+        return self
 
     def get_model(self):
         return self.model
 
     def get_graph(self):
-        plt.figure(figsize=(10,10))
+        plt.figure(figsize=(10, 10))
         nx.draw(self.graph, with_labels=True)
+        plt.draw()
         plt.show()
 
-    def get_roc(self):
-        return self.roc
-    
-    def save_model(self,folder):
-        self.model.save(f'{folder}/{self.score}-{self.accuracy}-{self.val_accuracy}-{self.loss}-{self.val_loss}-{self.num_parameters}-{self.roc}.h5')
 
+    def save_model(self, folder):
+        # save architecture as image and model as h5 file'
+        print("saving model")
+        score = self.score
+        print(score, "score")
+        tf.keras.utils.plot_model(self.model, to_file=f'/content/{folder}/{self.score}.png', show_shapes=True)
+        self.model.save(f'/content/{folder}/{self.score}')
     
-
-    
-
-
-    
-    
+    def get_score(self):
+        return self.score
