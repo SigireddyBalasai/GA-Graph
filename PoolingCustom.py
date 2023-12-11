@@ -6,7 +6,7 @@ class MaxPoolingCustom(tf.keras.layers.Layer):
         self.pool_size = pool_size
 
     def call(self, inputs):
-        print(inputs.shape , self.pool_size)
+        #print(inputs.shape , self.pool_size)
         if inputs.shape[1] % self.pool_size != 0:
             # add padding to make it compatable
             pad_size = self.pool_size - inputs.shape[1] % self.pool_size

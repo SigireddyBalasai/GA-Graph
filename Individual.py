@@ -15,7 +15,7 @@ class Individual:
         self.nodes = nodes
         self.edges = edges
         self.graph = assign_states(self.create_random_graph(), self.states)
-        self.normalized = to_useful(self.graph, self.states)
+        self.normalized = to_useful(self.graph)
         self.model = create_model(self.normalized, self.input_size, self.output_size)
         self.score = 0
 
@@ -43,13 +43,13 @@ class Individual:
 
     def mutate(self):
         self.graph = mutate_dag(self.graph)
-        self.normalized = to_useful(self.graph, self.states)
+        self.normalized = to_useful(self.graph)
         self.model = create_model(self.normalized, self.input_size, self.output_size)
         return self
 
     def crossover(self, other):
         self.graph = crossover(self.graph, other.graph)
-        self.normalized = to_useful(self.graph, self.states)
+        self.normalized = to_useful(self.graph)
         self.model = create_model(self.normalized, self.input_size, self.output_size)
         return self
 
@@ -68,8 +68,8 @@ class Individual:
         print("saving model")
         score = self.score
         print(score, "score")
-        tf.keras.utils.plot_model(self.model, to_file=f'/content/{folder}/{self.score}.png', show_shapes=True)
-        self.model.save(f'/content/{folder}/{self.score}')
+        tf.keras.utils.plot_model(self.model, to_file=f'{folder}/{self.score}.png', show_shapes=True)
+        self.model.save(f'{folder}/{self.score}')
     
     def get_score(self):
         return self.score

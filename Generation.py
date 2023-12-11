@@ -21,11 +21,12 @@ class Generation:
         self.population = [Individual(self.input_size, self.output_size, self.states, self.nodes, self.edges) for _ in range(self.population)]
     
     def score_population(self):
-        for individual in self.population:
+        population = self.population
+        for individual in population:
             individual.evaluate(train_ds=self.train_ds)
             print("individual score: ", individual.get_score())
-        self.population.sort(key=lambda x: x.get_score(), reverse=True)
-        return self.population
+        population.sort(key=lambda x: x.get_score(), reverse=True)
+        self.population = population
     
     def get_best_individual(self):
         return self.population[0]
@@ -36,8 +37,9 @@ class Generation:
             if random.random() < mutation_rate:
                 try:
                     mutated.append(individual.mutate())
+                    print(f"Mutating individual with score: {individual.get_score()}")
                 except:
-                    mutated.append(individual)
+                    pass
         self.population += mutated
     
     def crossover_population(self, crossover_rate):
@@ -56,7 +58,6 @@ class Generation:
         self.mutate_population(mutation_rate)
         self.crossover_population(crossover_rate)
         self.population.sort(key=lambda x: x.get_score(), reverse=True)
-        self.population = self.population[:self.limit]
         return self.population
     
     def run(self, n, mutation_rate, crossover_rate):

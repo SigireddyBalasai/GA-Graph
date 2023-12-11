@@ -52,27 +52,23 @@ def assign_states(graph, states):
         graph.nodes[i]['state'] = 'output'
     return graph
 
-def to_useful(graph, states):
+def to_useful(graph):
     # remove a node if no path to input or final node
     D = graph.copy()
-    for i in range(states[0]):
-        for j in range(states[0], states[0]+states[1]):
-            try:
-                if nx.has_path(D, i, j):
-                    continue
-                else:
-                    D.remove_node(j)
-            except:
-                pass
-    for i in range(states[0]+states[1], states[0]+states[1]+states[2]):
-        for j in range(states[0], states[0]+states[1]):
-            try:
-                if nx.has_path(D, j, i):
-                    continue
-                else:
-                    D.remove_node(j)
-            except:
-                pass
+    node_list = set(D.nodes())
+    print(node_list)
+    node_remove = set()
+    inputs = [node for node in D.nodes() if D.nodes[node]['state'] == 'input']
+    outputs = [node for node in D.nodes() if D.nodes[node]['state'] == 'output']
+    hidden = [node for node in D.nodes() if D.nodes[node]['state'] == 'hidden']
+    for node_hidden in hidden:
+        for node_input in inputs:
+            if not nx.has_path(D, node_input , node_hidden):
+                node_remove.add(node_hidden)
+        for node_output in outputs:
+            if not nx.has_path(D, node_hidden, node_output):
+                node_remove.add(node_hidden)
+    D.remove_nodes_from(node_remove)
     return D
 
 

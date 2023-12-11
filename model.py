@@ -11,9 +11,6 @@ def create_model(dag, input_size, output_size):
     input_layer = tf.keras.layers.Input(input_size, name='input_layer')
     layer_dict = {0: input_layer}
     input_layers = []
-    print(dag.nodes)
-    print(dag.edges)
-    print(nx.topological_sort(dag))
     for node in nx.topological_sort(dag):
         predecessors = list(dag.predecessors(node))
         predecessors.sort()
