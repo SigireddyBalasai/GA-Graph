@@ -1,13 +1,14 @@
 import tensorflow as tf
 
 class ConLocPadLayer(tf.keras.layers.Layer):
-    def __init__(self, filters, kernel_size, padding='valid', strides=(1, 1), activation=None, **kwargs):
+    def __init__(self, filters, kernel_size, padding='valid', strides=(1, 1), activation=None,trainable=True, **kwargs):
         super(ConLocPadLayer, self).__init__(**kwargs)
         self.filters = filters
         self.kernel_size = kernel_size
         self.padding = padding
         self.strides = strides
         self.activation = activation
+        self.trainable = trainable
 
     def build(self, input_shape):
         self.locally_connected2d_layer = tf.keras.layers.LocallyConnected2D(

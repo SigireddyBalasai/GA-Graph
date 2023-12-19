@@ -1,7 +1,7 @@
 #custom maxpooling layer with error condition and no padding
 import tensorflow as tf
 class MaxPoolingCustom(tf.keras.layers.Layer):
-    def __init__(self, pool_size, name):
+    def __init__(self, pool_size, name, **kwargs):
         super(MaxPoolingCustom, self).__init__(name=name)
         self.pool_size = pool_size
 
@@ -24,7 +24,7 @@ class MaxPoolingCustom(tf.keras.layers.Layer):
     
 
 class AveragePoolingCustom(tf.keras.layers.Layer):
-    def __init__(self, pool_size, name):
+    def __init__(self, pool_size, name, **kwargs):
         super(AveragePoolingCustom, self).__init__(name=name)
         self.pool_size = pool_size
 

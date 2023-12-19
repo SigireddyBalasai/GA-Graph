@@ -1,4 +1,4 @@
-from graph import create_random_graph, assign_states, to_useful
+from graph import create_random_graph, assign_states, to_useful,create_final_graph
 from model import create_model
 from crossover import crossover
 from mutate import mutate_dag
@@ -21,12 +21,16 @@ class Individual:
 
     def create_random_graph(self):
         graph = nx.DiGraph()
-        graph = create_random_graph(self.nodes, self.edges)
+        graph1 = create_random_graph(self.nodes, self.edges)
+        graph2 = create_random_graph(self.nodes, self.edges)
+        graph = create_final_graph(graph1,graph2)
         return graph
 
     def evaluate(self, train_ds):
         accuracies = []
-        self.model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+        loss = tf.keras.losses.CategoricalCrossentropy()
+        optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001)
+        self.model.compile(optimizer=optimizer, loss=loss, metrics=tf.keras.metrics.CategoricalAccuracy())
         for i in train_ds:
             #x = tf.expand_dims(i[0], axis=0)
             #y = tf.expand_dims(i[1], axis=0)
@@ -64,12 +68,16 @@ class Individual:
 
 
     def save_model(self, folder):
+        model = tf.keras.models.clone_model(self.model)
         # save architecture as image and model as h5 file'
         print("saving model")
         score = self.score
         print(score, "score")
         tf.keras.utils.plot_model(self.model, to_file=f'{folder}/{self.score}.png', show_shapes=True)
-        self.model.save(f'{folder}/{self.score}')
+        print(f"image saved in {folder}/{self.score}.png")
+        model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        model.save(f'{folder}/{self.score}')
+        self.model = model
     
     def get_score(self):
         return self.score

@@ -4,7 +4,7 @@ import os
 import tensorflow as tf
 
 class Generation:
-    def __init__(self, input_size, output_size, states, nodes, edges, population, limit, train_ds, test_ds):
+    def __init__(self, input_size, output_size, states, nodes, edges, population, limit, train_ds, test_ds,loss,optimizer,metrics,callbacks):
         self.input_size = input_size
         self.output_size = output_size
         self.states = states
@@ -15,6 +15,10 @@ class Generation:
         self.generation = 0
         self.train_ds = train_ds
         self.test_ds = test_ds
+        self.loss = loss
+        self.optimizer = optimizer
+        self.metrics = metrics
+        self.callbacks = callbacks
         self.create_population()
 
     def create_population(self):
@@ -46,17 +50,16 @@ class Generation:
         crossed = []
         for i in range(len(self.population)):
             if random.random() < crossover_rate:
-                try:
-                    crossed.append(self.population[i].crossover(self.population[i-1]))
-                except:
-                    crossed.append(self.population[i])
+                child1 , child2 = self.population[i].crossover(self.population[i-1])
+                crossed.append(child1)
+                crossed.append(child2)
         self.population += crossed
         return self.population
     
     def next_generation(self, mutation_rate, crossover_rate):
         self.score_population()
         self.mutate_population(mutation_rate)
-        self.crossover_population(crossover_rate)
+        #self.crossover_population(crossover_rate)
         self.population.sort(key=lambda x: x.get_score(), reverse=True)
         return self.population
     
@@ -67,14 +70,12 @@ class Generation:
             self.next_generation(mutation_rate, crossover_rate)
             print(f'Best score: {self.population[0].get_score()}')
             model = self.population[0].get_model()
-            model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
-            reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
-                            patience=3, min_lr=0.0000001)
-            model.fit(self.train_ds, validation_data=self.test_ds,verbose=1,epochs=5,callbacks=[reduce_lr])
+            model.compile(loss=self.loss, optimizer=self.optimizer, metrics=self.metrics)
+            model.summary()
+            model.fit(self.train_ds, epochs=100, validation_data=self.test_ds,callbacks=self.callbacks)
             print('---------------------------------------------------')
             for individual in self.population:
                 print("individual score: ", individual.get_score())
-                print("individual architecture: ", individual.get_model().summary())
+                #print("individual architecture: ", individual.get_model().summary())
                 individual.save_model(f'generation_{self.generation}')
-                tf.keras.utils.plot_model(individual.get_model(), to_file=f'generation_{self.generation}/individual_{individual.get_score()}_architecture.png', show_shapes=True)
             self.generation += 1
