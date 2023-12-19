@@ -22,6 +22,7 @@ class ZeroPadConcatLayer(tf.keras.layers.Layer):
         #print(concatenated_tensor.shape, "concatenated_tensor.shape", max_width, max_height, "max_width, max_height", [x.shape for x in inputs], "inputs")
         return concatenated_tensor
     
+    
 
 
 
