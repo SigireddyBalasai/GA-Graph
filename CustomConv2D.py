@@ -10,6 +10,7 @@ class Conv2DPadLayer(tf.keras.layers.Layer):
         self.strides = strides
         self.activation = activation
         self.trainable = trainable
+        self.ratio = random.randint(1, 16)
 
     def build(self, input_shape):
         self.conv2d_layer = tf.keras.layers.Conv2D(
@@ -25,9 +26,8 @@ class Conv2DPadLayer(tf.keras.layers.Layer):
         print(inputs.shape)
         print(self.kernel_size)
         if self.padding == 'valid' and inputs.shape[1] < self.kernel_size[0] and inputs.shape[2] < self.kernel_size[1]:
-            ratio = random.randint(1, 16)
-            resize_height = self.kernel_size[0] * ratio
-            resize_width = self.kernel_size[1] * ratio
+            resize_height = self.kernel_size[0] * self.ratio
+            resize_width = self.kernel_size[1] * self.ratio
             inputs = tf.image.resize(inputs, (resize_height, resize_width))
         
         # Perform convolution
