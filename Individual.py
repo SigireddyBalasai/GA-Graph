@@ -21,8 +21,12 @@ class Individual:
 
     def create_random_graph(self):
         graph = nx.DiGraph()
-        graph1 = create_random_graph(self.nodes, self.edges)
-        graph2 = create_random_graph(self.nodes, self.edges)
+        if type(self.nodes) == tuple:
+            graph1 = create_random_graph(self.nodes[0], self.edges)
+            graph2 = create_random_graph(self.nodes[1], self.edges)
+        else:
+            graph1 = create_random_graph(self.nodes, self.edges)
+            graph2 = create_random_graph(self.nodes, self.edges)
         graph = create_final_graph(graph1,graph2)
         return graph
 
