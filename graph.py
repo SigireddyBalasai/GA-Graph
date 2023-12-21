@@ -62,7 +62,8 @@ def assign_states(graph:nx.DiGraph, states: tuple[int, int,int,int, int, int]):
         graph.nodes['2-' + str(i - states[2])]['state'] = 'transition'
     for i in range(states[3],states[4]):
         graph.nodes['2-' + str(i - states[2])]['state'] = 'hidden_2'
-        choice = random.choices(['Dense', 'LSTM'], weights=[0.75, 0.25], k=1)[0]
+        #choice = random.choices(['Dense', 'LSTM'], weights=[0.75, 0.25], k=1)[0]
+        choice = 'Dense'
         graph.nodes['2-' + str(i - states[2])]['layer'] = choice
         if choice == 'Dense':
             graph.nodes['2-' + str(i - states[2])]['units'] = random.randint(1, 64)
