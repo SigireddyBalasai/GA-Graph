@@ -81,7 +81,7 @@ def create_model(dag ,input_size, output_size):
             
             try:
                 conv_max = tf.keras.layers.Conv2D(filters=1, kernel_size=1, activation='relu', name=f'{node}_conv2d')(concat_layer)
-                conv_max = tf.keras.layers.MaxPooling2D(pool_size=conv_max.shape[1]//5, name=f'{node}_maxpooling2d')(conv_max)
+                #conv_max = tf.keras.layers.MaxPooling2D(pool_size=conv_max.shape[1]//5, name=f'{node}_maxpooling2d')(conv_max)
                 concat_layer = tf.keras.layers.Flatten(name=f'{node}___flatten')(conv_max)
                 #concat_layer = tf.keras.layers.GlobalAveragePooling2D(name=f'{node}_globalaveragepooling2d',keepdims=True,data_format='channels_last')(concat_layer)
             except:
