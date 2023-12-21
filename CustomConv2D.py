@@ -1,4 +1,5 @@
 import tensorflow as tf
+import random
 
 class Conv2DPadLayer(tf.keras.layers.Layer):
     def __init__(self, filters, kernel_size, padding='valid', strides=(1, 1), activation=None,trainable=True, **kwargs):
@@ -23,11 +24,11 @@ class Conv2DPadLayer(tf.keras.layers.Layer):
     def call(self, inputs):
         print(inputs.shape)
         print(self.kernel_size)
-        # Check if input size is less than kernel size
         if self.padding == 'valid' and inputs.shape[1] < self.kernel_size[0] and inputs.shape[2] < self.kernel_size[1]:
-            pad_height = self.kernel_size[0] - inputs.shape[1]
-            pad_width = self.kernel_size[1] - inputs.shape[2]
-            inputs = tf.pad(inputs, ((0, 0), (pad_height, pad_height), (pad_width, pad_width), (0, 0)))
+            ratio = random.randint(1, 16)
+            resize_height = self.kernel_size[0] * ratio
+            resize_width = self.kernel_size[1] * ratio
+            inputs = tf.image.resize(inputs, (resize_height, resize_width))
         
         # Perform convolution
         output = self.conv2d_layer(inputs)
