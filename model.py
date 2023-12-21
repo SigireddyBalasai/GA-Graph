@@ -6,9 +6,26 @@ from Zpad import ZeroPadConcatLayer
 from PoolingCustom import MaxPoolingCustom, AveragePoolingCustom
 from CustomConv2D import Conv2DPadLayer
 from CustomLocallyConnected import ConLocPadLayer
+import random
+
+class PreProcessing(tf.keras.layers.Layer):
+    """this will take a 2d image and will apply flip horizantal vertical and pass to array"""
+    def __init__(self, **kwargs):
+        super(PreProcessing, self).__init__(**kwargs)
+        
+    def call(self,inputs):
+        choices = random.choice(['horizantal','vertical','both'])
+        if choices == 'horizantal':
+            inputs = tf.image.flip_left_right(inputs)
+        if choices == 'vertical':
+            inputs = tf.image.flip_up_down(inputs)
+        if choices == 'both':
+            inputs = tf.image.flip_up_down(tf.image.flip_left_right(inputs))
+        return inputs
+    
 
 def create_model(dag ,input_size, output_size):
-    input_layer = tf.keras.layers.Input(input_size, name='input_layer')
+    input_layer = PreProcessing(tf.keras.layers.Input(input_size, name='input_layer'))
     layer_dict = {'1-0': input_layer}
     input_layers = []
     #print(dag.nodes)
