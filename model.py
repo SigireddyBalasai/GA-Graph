@@ -25,7 +25,7 @@ class PreProcessing(tf.keras.layers.Layer):
     
 
 def create_model(dag ,input_size, output_size):
-    input_layer = PreProcessing(tf.keras.layers.Input(input_size, name='input_layer'))
+    input_layer = PreProcessing()(tf.keras.layers.Input(input_size, name='input_layer'))
     layer_dict = {'1-0': input_layer}
     input_layers = []
     #print(dag.nodes)
