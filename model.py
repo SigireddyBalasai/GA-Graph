@@ -56,7 +56,12 @@ def create_model(dag ,input_size, output_size):
             elif layer_type == 'Dense':
                 layer_dict[node] = tf.keras.layers.Dense(units=dag.nodes[node]['units'], activation=dag.nodes[node]['activation'], name=f'{node}.{"".join(list(map(str,predecessors)))}dense')(concat_layer)
             elif layer_type == 'Conv2D':
-                layer_dict[node] = Conv2DPadLayer(filters=dag.nodes[node]['filters'], kernel_size=dag.nodes[node]['kernel_size'], activation=dag.nodes[node]['activation'], name=f'{node}.{"".join(list(map(str,predecessors)))}conv2d', strides=1)(concat_layer)
+                conact = Conv2DPadLayer(filters=dag.nodes[node]['filters'], kernel_size=dag.nodes[node]['kernel_size'], activation=dag.nodes[node]['activation'], name=f'{node}.{"".join(list(map(str,predecessors)))}conv2d', strides=1)(concat_layer)
+                if dag.nodes[node]['suceedor'] == 'MaxPooling2D':
+                    layer_dict[node] = MaxPoolingCustom(pool_size=dag.nodes[node]['pool_size'], name=f'{node}.{"".join(list(map(str,predecessors)))}maxpooling2d')(conact)
+                elif dag.nodes[node]['suceedor'] == 'AveragePooling2D':
+                    layer_dict[node] = AveragePoolingCustom(pool_size=dag.nodes[node]['pool_size'], name=f'{node}.{"".join(list(map(str,predecessors)))}averagepooling2d')(conact)
+
             elif layer_type == 'MaxPooling2D':
                 layer_dict[node] = MaxPoolingCustom(pool_size=dag.nodes[node]['pool_size'], name=f'{node}.{"".join(list(map(str,predecessors)))}maxpooling2d')(concat_layer)
             elif layer_type == 'AveragePooling2D':

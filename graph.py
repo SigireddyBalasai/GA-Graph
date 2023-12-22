@@ -43,6 +43,12 @@ def assign_states(graph:nx.DiGraph, states: tuple[int, int,int,int, int, int]):
             graph.nodes['1-' + str(i)]['filters'] = random.randint(1, 64)
             graph.nodes['1-' + str(i)]['kernel_size'] = (kernel_size, kernel_size)  # Ensure both dimensions are the same
             graph.nodes['1-' + str(i)]['activation'] = random.choice(['relu','sigmoid','softmax','tanh'])
+            choice_followed_by = random.choices(['MaxPooling','AveragePooling'],k=1)[0]
+            graph.nodes['i-'+str(i)]['suceedor'] = choice_followed_by
+            if choice_followed_by == 'MaxPooling':
+                graph.nodes['1-' + str(i)]['pool_size'] = random.randint(1, 16)
+            elif choice_followed_by == 'AveragePooling':
+                graph.nodes['1-' + str(i)]['pool_size'] = random.randint(1, 16)
         elif choice == 'MaxPooling2D':
             graph.nodes['1-' + str(i)]['pool_size'] = random.randint(1, 16)
         elif choice == 'AveragePooling2D':
