@@ -36,11 +36,11 @@ def assign_states(graph:nx.DiGraph, states: tuple[int, int,int,int, int, int]):
         graph.nodes['1-' + str(i)]['state'] = 'input'
     for i in range(states[0],states[1]):
         graph.nodes['1-' + str(i)]['state'] = 'hidden_1'
-        choice = random.choices(['Conv2D', 'MaxPooling2D', 'AveragePooling2D', 'GlobalAveragePooling2D', 'DropOut','Conv2DTranspose'], weights=[0.9, 0.03, 0.03, 0.005, 0.03, 0.005], k=1)[0]
+        choice = random.choices(['Conv2D', 'MaxPooling2D', 'AveragePooling2D', 'GlobalAveragePooling2D', 'DropOut','Conv2DTranspose'], weights=[0.7, 0.1, 0.1, 0.05, 0.025, 0.025], k=1)[0]
         graph.nodes['1-' + str(i)]['layer'] = choice
         if choice == 'Conv2D':
-            graph.nodes['1-' + str(i)]['filters'] = random.randint(1, 16)
-            kernel_size = random.randint(1, 64)
+            kernel_size = random.randint(1,3) * 2 + 1
+            graph.nodes['1-' + str(i)]['filters'] = random.randint(1, 64)
             graph.nodes['1-' + str(i)]['kernel_size'] = (kernel_size, kernel_size)  # Ensure both dimensions are the same
             graph.nodes['1-' + str(i)]['activation'] = random.choice(['relu','sigmoid','softmax','tanh'])
         elif choice == 'MaxPooling2D':
